@@ -1,0 +1,23 @@
+contactcontroller 
+
+//original
+case 'user':
+//$contacts = User::where('id', '!=', auth()->id())->where('role', '=', 'operator')->get();
+$contacts = DB::table('users')
+            ->whereIn('id', function($query){
+                $query
+                ->select(DB::raw('users.id from users'))
+                ->distinct()
+                ->leftJoin('messages', function($join){
+                $join->on('users.id', '=', 'messages.from');
+                })
+                ->whereNotNull('messages.from')
+                ->where('role','=','operator')
+                ->where('messages.to','=', auth()->id());
+            })
+            ->get();
+break; 
+
+authcontroller 
+
+welcometext changed to make 1 to 1 change more clean
